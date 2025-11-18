@@ -1,34 +1,27 @@
-FROM php:8.3-fpm
+# ----------------------------
+# Image PHP + Nginx optimisée
+# ----------------------------
+FROM webdevops/php-nginx:8.3
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    zip \
-    unzip \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
+# Dossier de travail
+WORKDIR /app
 
-# Install Composer
-COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
-
-# Set working directory
-WORKDIR /var/www
-
-# Copy project files
+# Copier les fichiers du projet
 COPY . .
 
-# Install project dependencies
+# Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Donner les permissions à Laravel
+RUN chown -R application:application /app/storage /app/bootstrap/cache
 
-# Expose port
-EXPOSE 8000
+# Optimisations Laravel
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
 
-# Laravel commands + start server
-CMD php artisan migrate --force && php -S 0.0.0.0:8000 -t public
+# Exposer le port Nginx
+EXPOSE 80
+
+# Commande de démarrage
+CMD php artisan migrate --force && supervisord
