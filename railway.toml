@@ -1,5 +1,0 @@
-[build]
-dockerfile = "Dockerfile"
-
-[service]
-internal_port = 80

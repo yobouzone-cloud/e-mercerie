@@ -1,28 +1,34 @@
-# Base image PHP + nginx (prod ready)
-FROM webdevops/php-nginx:8.3
+FROM php:8.3-fpm
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    zip \
+    unzip \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
+
+# Install Composer
+COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
-WORKDIR /app
+WORKDIR /var/www
 
 # Copy project files
 COPY . .
 
-# Install PHP dependencies
+# Install project dependencies
 RUN composer install --no-dev --optimize-autoloader
 
 # Set permissions
-RUN chown -R application:application /app/storage /app/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Cache config/routes/views
-RUN php artisan config:cache
-RUN php artisan route:cache
-RUN php artisan view:cache
+# Expose port
+EXPOSE 8000
 
-# Link storage (si nécessaire)
-RUN php artisan storage:link || true
-
-# Expose port 80
-EXPOSE 80
-
-# Start supervisord (php-fpm + nginx)
-CMD ["supervisord", "-n"]
+# Laravel commands + start server
+CMD php artisan migrate --force && php -S 0.0.0.0:8000 -t public
