@@ -143,6 +143,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/', [NotificationController::class, 'clearAll'])->name('notifications.clearAll');
     });
 
+    
         // Endpoint pour enregistrer une web-push subscription (auth requis)
         Route::post('/push/subscribe', [\App\Http\Controllers\PushController::class, 'store'])->middleware('auth')->name('push.subscribe');
 
