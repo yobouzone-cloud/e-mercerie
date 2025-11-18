@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: emercerie-backend
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: starter
+    region: oregon
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_KEY
+        value: base64:gTBn4JcjSHY/yB5fbVXWzZlk0/RAq9Hjijqcvow3PYY=
+      - key: APP_DEBUG
+        value: "false"
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        value: dpg-d3o7fpur433s739rs860-a
+      - key: DB_PORT
+        value: 5432
+      - key: DB_DATABASE
+        value: e_mercerie_db
+      - key: DB_USERNAME
+        value: e_mercerie_db_user
+      - key: DB_PASSWORD
+        value: 0ukBRqIuR6ebyBLVLrIcIdE5CMnySiRU
+      - key: LOG_CHANNEL
+        value: errorlog
+
+databases:
+  - name: e-mercerie_db
+    engine: postgresql
+    version: "17"
+    plan: free
+    region: Oregon (US West)
